@@ -57,6 +57,8 @@ export default {
           border: "hsl(var(--sidebar-border))",
           ring: "hsl(var(--sidebar-ring))",
         },
+        "invoice-header": "hsl(var(--invoice-header))",
+        "invoice-border": "hsl(var(--invoice-border))",
       },
       borderRadius: {
         lg: "var(--radius)",
