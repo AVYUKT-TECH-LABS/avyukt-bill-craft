@@ -26,11 +26,19 @@ const Index = () => {
       {
         id: "1",
         description: "",
+        hsnSac: "",
         quantity: 1,
         price: 0,
       },
     ],
+    cgst: 9,
+    sgst: 9,
+    igst: 0,
+    bankName: "",
+    accountNumber: "",
+    ifscCode: "",
     paymentLink: "",
+    notes: "",
   });
 
   const previewRef = useRef<HTMLDivElement>(null);
