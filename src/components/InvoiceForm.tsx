@@ -41,6 +41,11 @@ export const InvoiceForm = ({ data, onChange }: InvoiceFormProps) => {
     onChange({ ...data, items: newItems });
   };
 
+  const handleTaxChange = (field: "cgst" | "sgst" | "igst", value: string) => {
+    const numValue = parseFloat(value) || 0;
+    onChange({ ...data, [field]: numValue });
+  };
+
   const addItem = () => {
     const newItem: InvoiceItem = {
       id: Date.now().toString(),
@@ -150,7 +155,7 @@ export const InvoiceForm = ({ data, onChange }: InvoiceFormProps) => {
               placeholder="8178392040"
             />
           </div>
-          <div className="space-y-2 md:col-span-2">
+          <div className="space-y-2">
             <Label htmlFor="companyEmail">Email</Label>
             <Input
               id="companyEmail"
@@ -158,6 +163,24 @@ export const InvoiceForm = ({ data, onChange }: InvoiceFormProps) => {
               value={data.companyEmail}
               onChange={(e) => handleInputChange("companyEmail", e.target.value)}
               placeholder="divyansh@avyuktlabs.in"
+            />
+          </div>
+          <div className="space-y-2">
+            <Label htmlFor="companyGSTIN">GSTIN (Optional)</Label>
+            <Input
+              id="companyGSTIN"
+              value={data.companyGSTIN || ""}
+              onChange={(e) => handleInputChange("companyGSTIN", e.target.value)}
+              placeholder="22AAAAA0000A1Z5"
+            />
+          </div>
+          <div className="space-y-2">
+            <Label htmlFor="companyPAN">PAN (Optional)</Label>
+            <Input
+              id="companyPAN"
+              value={data.companyPAN || ""}
+              onChange={(e) => handleInputChange("companyPAN", e.target.value)}
+              placeholder="AAAAA0000A"
             />
           </div>
         </div>
@@ -186,6 +209,33 @@ export const InvoiceForm = ({ data, onChange }: InvoiceFormProps) => {
               placeholder="client@example.com"
             />
           </div>
+          <div className="space-y-2">
+            <Label htmlFor="clientGSTIN">Client GSTIN (Optional)</Label>
+            <Input
+              id="clientGSTIN"
+              value={data.clientGSTIN || ""}
+              onChange={(e) => handleInputChange("clientGSTIN", e.target.value)}
+              placeholder="22AAAAA0000A1Z5"
+            />
+          </div>
+          <div className="space-y-2">
+            <Label htmlFor="clientAddress">Client Address (Optional)</Label>
+            <Input
+              id="clientAddress"
+              value={data.clientAddress || ""}
+              onChange={(e) => handleInputChange("clientAddress", e.target.value)}
+              placeholder="Full Address"
+            />
+          </div>
+          <div className="space-y-2">
+            <Label htmlFor="clientState">Client State (Optional)</Label>
+            <Input
+              id="clientState"
+              value={data.clientState || ""}
+              onChange={(e) => handleInputChange("clientState", e.target.value)}
+              placeholder="State Name"
+            />
+          </div>
         </div>
       </section>
 
@@ -200,14 +250,23 @@ export const InvoiceForm = ({ data, onChange }: InvoiceFormProps) => {
         </div>
         <div className="space-y-3">
           {data.items.map((item, index) => (
-            <div key={item.id} className="flex gap-3 items-end">
-              <div className="flex-1 space-y-2">
+            <div key={item.id} className="flex gap-3 items-end flex-wrap">
+              <div className="flex-1 min-w-[200px] space-y-2">
                 <Label htmlFor={`item-desc-${index}`}>Description</Label>
                 <Input
                   id={`item-desc-${index}`}
                   value={item.description}
                   onChange={(e) => handleItemChange(index, "description", e.target.value)}
                   placeholder="Service or product description"
+                />
+              </div>
+              <div className="w-32 space-y-2">
+                <Label htmlFor={`item-hsn-${index}`}>HSN/SAC</Label>
+                <Input
+                  id={`item-hsn-${index}`}
+                  value={item.hsnSac || ""}
+                  onChange={(e) => handleItemChange(index, "hsnSac", e.target.value)}
+                  placeholder="998314"
                 />
               </div>
               <div className="w-24 space-y-2">
@@ -244,6 +303,86 @@ export const InvoiceForm = ({ data, onChange }: InvoiceFormProps) => {
         </div>
       </section>
 
+      {/* Tax Settings */}
+      <section className="space-y-4">
+        <h2 className="text-xl font-semibold text-foreground">GST/Tax Details</h2>
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+          <div className="space-y-2">
+            <Label htmlFor="cgst">CGST (%)</Label>
+            <Input
+              id="cgst"
+              type="number"
+              min="0"
+              max="100"
+              step="0.01"
+              value={data.cgst}
+              onChange={(e) => handleTaxChange("cgst", e.target.value)}
+            />
+          </div>
+          <div className="space-y-2">
+            <Label htmlFor="sgst">SGST (%)</Label>
+            <Input
+              id="sgst"
+              type="number"
+              min="0"
+              max="100"
+              step="0.01"
+              value={data.sgst}
+              onChange={(e) => handleTaxChange("sgst", e.target.value)}
+            />
+          </div>
+          <div className="space-y-2">
+            <Label htmlFor="igst">IGST (%)</Label>
+            <Input
+              id="igst"
+              type="number"
+              min="0"
+              max="100"
+              step="0.01"
+              value={data.igst}
+              onChange={(e) => handleTaxChange("igst", e.target.value)}
+            />
+          </div>
+        </div>
+        <p className="text-xs text-muted-foreground">
+          Note: Use CGST + SGST for intra-state or IGST for inter-state transactions
+        </p>
+      </section>
+
+      {/* Bank Details */}
+      <section className="space-y-4">
+        <h2 className="text-xl font-semibold text-foreground">Bank Details (Optional)</h2>
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+          <div className="space-y-2">
+            <Label htmlFor="bankName">Bank Name</Label>
+            <Input
+              id="bankName"
+              value={data.bankName || ""}
+              onChange={(e) => handleInputChange("bankName", e.target.value)}
+              placeholder="Bank Name"
+            />
+          </div>
+          <div className="space-y-2">
+            <Label htmlFor="accountNumber">Account Number</Label>
+            <Input
+              id="accountNumber"
+              value={data.accountNumber || ""}
+              onChange={(e) => handleInputChange("accountNumber", e.target.value)}
+              placeholder="1234567890"
+            />
+          </div>
+          <div className="space-y-2">
+            <Label htmlFor="ifscCode">IFSC Code</Label>
+            <Input
+              id="ifscCode"
+              value={data.ifscCode || ""}
+              onChange={(e) => handleInputChange("ifscCode", e.target.value)}
+              placeholder="SBIN0001234"
+            />
+          </div>
+        </div>
+      </section>
+
       {/* Payment Link */}
       <section className="space-y-4">
         <h2 className="text-xl font-semibold text-foreground">Payment Link (Optional)</h2>
@@ -261,7 +400,7 @@ export const InvoiceForm = ({ data, onChange }: InvoiceFormProps) => {
 
       {/* Signature Upload */}
       <section className="space-y-4">
-        <h2 className="text-xl font-semibold text-foreground">Your Signature (Optional)</h2>
+        <h2 className="text-xl font-semibold text-foreground">Authorized Signatory (Optional)</h2>
         <div className="space-y-3">
           {data.signature ? (
             <div className="relative inline-block">
@@ -299,6 +438,20 @@ export const InvoiceForm = ({ data, onChange }: InvoiceFormProps) => {
               </Button>
             </div>
           )}
+        </div>
+      </section>
+
+      {/* Notes/Terms */}
+      <section className="space-y-4">
+        <h2 className="text-xl font-semibold text-foreground">Notes/Terms (Optional)</h2>
+        <div className="space-y-2">
+          <Label htmlFor="notes">Terms and Conditions</Label>
+          <Input
+            id="notes"
+            value={data.notes || ""}
+            onChange={(e) => handleInputChange("notes", e.target.value)}
+            placeholder="Payment terms, delivery notes, etc."
+          />
         </div>
       </section>
     </div>
