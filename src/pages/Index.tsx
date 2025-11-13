@@ -3,7 +3,7 @@ import { InvoiceForm } from "@/components/InvoiceForm";
 import { InvoicePreview } from "@/components/InvoicePreview";
 import { InvoiceData } from "@/types/invoice";
 import { Button } from "@/components/ui/button";
-import { FileDown, Eye, Edit } from "lucide-react";
+import { FileDown } from "lucide-react";
 import { toast } from "sonner";
 import html2canvas from "html2canvas";
 import jsPDF from "jspdf";
@@ -33,7 +33,6 @@ const Index = () => {
     paymentLink: "",
   });
 
-  const [showPreview, setShowPreview] = useState(false);
   const previewRef = useRef<HTMLDivElement>(null);
 
   const handleDownloadPDF = async () => {
@@ -91,40 +90,32 @@ const Index = () => {
               <h1 className="text-2xl font-bold text-foreground">Invoice Generator</h1>
               <p className="text-sm text-muted-foreground">Create professional invoices in seconds</p>
             </div>
-            <div className="flex gap-2">
-              {showPreview ? (
-                <>
-                  <Button onClick={() => setShowPreview(false)} variant="outline" className="gap-2">
-                    <Edit className="h-4 w-4" />
-                    Edit
-                  </Button>
-                  <Button onClick={handleDownloadPDF} className="gap-2">
-                    <FileDown className="h-4 w-4" />
-                    Download PDF
-                  </Button>
-                </>
-              ) : (
-                <Button onClick={() => setShowPreview(true)} className="gap-2">
-                  <Eye className="h-4 w-4" />
-                  Preview
-                </Button>
-              )}
-            </div>
+            <Button onClick={handleDownloadPDF} className="gap-2">
+              <FileDown className="h-4 w-4" />
+              Download PDF
+            </Button>
           </div>
         </div>
       </header>
 
-      {/* Main Content */}
+      {/* Main Content - Side by Side */}
       <main className="container mx-auto px-4 py-8">
-        {showPreview ? (
-          <div ref={previewRef} className="mb-8">
-            <InvoicePreview data={invoiceData} />
-          </div>
-        ) : (
-          <div className="max-w-4xl mx-auto bg-background rounded-lg shadow-lg p-8">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+          {/* Form Section */}
+          <div className="bg-background rounded-lg shadow-lg p-6 h-fit sticky top-24">
             <InvoiceForm data={invoiceData} onChange={setInvoiceData} />
           </div>
-        )}
+
+          {/* Live Preview Section */}
+          <div className="space-y-4">
+            <div className="bg-muted/50 rounded-lg p-3 text-center">
+              <p className="text-sm font-medium text-foreground">Live Preview</p>
+            </div>
+            <div ref={previewRef}>
+              <InvoicePreview data={invoiceData} />
+            </div>
+          </div>
+        </div>
       </main>
     </div>
   );

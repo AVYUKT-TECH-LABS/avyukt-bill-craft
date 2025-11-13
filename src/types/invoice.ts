@@ -28,4 +28,7 @@ export interface InvoiceData {
   
   // Payment link (optional)
   paymentLink?: string;
+  
+  // Signature (optional)
+  signature?: string;
 }

@@ -1,5 +1,6 @@
 import { InvoiceData } from "@/types/invoice";
 import { format } from "date-fns";
+import logo from "@/assets/avyukt-logo.webp";
 
 interface InvoicePreviewProps {
   data: InvoiceData;
@@ -33,11 +34,30 @@ export const InvoicePreview = ({ data }: InvoicePreviewProps) => {
   const subtotal = calculateSubtotal();
 
   return (
-    <div className="bg-background border border-border rounded-lg shadow-lg p-8 max-w-4xl mx-auto">
-      {/* Header */}
-      <div className="flex justify-between items-start mb-8">
-        <div>
-          <h1 className="text-4xl font-bold text-foreground mb-6">Invoice</h1>
+    <div className="bg-background border border-border rounded-lg shadow-lg p-8 max-w-4xl mx-auto relative overflow-hidden">
+      {/* Watermark */}
+      <div 
+        className="absolute inset-0 flex items-center justify-center pointer-events-none"
+        style={{ opacity: 0.08 }}
+      >
+        <img 
+          src={logo} 
+          alt="Watermark" 
+          className="w-[600px] h-auto object-contain"
+        />
+      </div>
+
+      {/* Content - with relative positioning to appear above watermark */}
+      <div className="relative z-10">
+        {/* Logo */}
+        <div className="flex justify-center mb-6">
+          <img src={logo} alt="AVYUKT TECH LABS" className="h-16 object-contain" />
+        </div>
+
+        {/* Header */}
+        <div className="flex justify-between items-start mb-8">
+          <div>
+            <h1 className="text-4xl font-bold text-foreground mb-6">Invoice</h1>
           <div className="space-y-1">
             <p className="text-lg font-semibold text-foreground">{data.companyName}</p>
             <p className="text-sm text-muted-foreground">{data.companyAddress}</p>
@@ -133,20 +153,26 @@ export const InvoicePreview = ({ data }: InvoicePreviewProps) => {
         </div>
       )}
 
-      {/* Footer */}
-      <div className="flex justify-between items-end pt-8 border-t border-border">
-        <div className="text-center">
-          <div className="border-t-2 border-foreground w-48 mb-2"></div>
-          <p className="text-sm font-medium text-foreground">{data.companyName}</p>
+        {/* Footer */}
+        <div className="flex justify-between items-end pt-8 border-t border-border">
+          <div className="text-center">
+            {data.signature && (
+              <div className="mb-2">
+                <img src={data.signature} alt="Company Signature" className="h-16 mx-auto" />
+              </div>
+            )}
+            <div className="border-t-2 border-foreground w-48 mb-2"></div>
+            <p className="text-sm font-medium text-foreground">{data.companyName}</p>
+          </div>
+          <div className="text-center">
+            <div className="border-t-2 border-foreground w-48 mb-2 mt-16"></div>
+            <p className="text-sm font-medium text-foreground">{data.clientName}</p>
+          </div>
         </div>
-        <div className="text-center">
-          <div className="border-t-2 border-foreground w-48 mb-2"></div>
-          <p className="text-sm font-medium text-foreground">{data.clientName}</p>
+        
+        <div className="text-center mt-6">
+          <p className="text-xs text-muted-foreground">{formatDate(data.date)}</p>
         </div>
-      </div>
-      
-      <div className="text-center mt-6">
-        <p className="text-xs text-muted-foreground">{formatDate(data.date)}</p>
       </div>
     </div>
   );
