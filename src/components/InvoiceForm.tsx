@@ -1,8 +1,9 @@
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
-import { Plus, Trash2 } from "lucide-react";
+import { Plus, Trash2, Upload, X } from "lucide-react";
 import { InvoiceData, InvoiceItem } from "@/types/invoice";
+import { useRef } from "react";
 
 interface InvoiceFormProps {
   data: InvoiceData;
@@ -10,8 +11,28 @@ interface InvoiceFormProps {
 }
 
 export const InvoiceForm = ({ data, onChange }: InvoiceFormProps) => {
+  const signatureInputRef = useRef<HTMLInputElement>(null);
+
   const handleInputChange = (field: keyof InvoiceData, value: string) => {
     onChange({ ...data, [field]: value });
+  };
+
+  const handleSignatureUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        onChange({ ...data, signature: reader.result as string });
+      };
+      reader.readAsDataURL(file);
+    }
+  };
+
+  const removeSignature = () => {
+    onChange({ ...data, signature: undefined });
+    if (signatureInputRef.current) {
+      signatureInputRef.current.value = "";
+    }
   };
 
   const handleItemChange = (index: number, field: keyof InvoiceItem, value: string | number) => {
@@ -235,6 +256,49 @@ export const InvoiceForm = ({ data, onChange }: InvoiceFormProps) => {
             onChange={(e) => handleInputChange("paymentLink", e.target.value)}
             placeholder="https://payments.cashfree.com/links?code=..."
           />
+        </div>
+      </section>
+
+      {/* Signature Upload */}
+      <section className="space-y-4">
+        <h2 className="text-xl font-semibold text-foreground">Your Signature (Optional)</h2>
+        <div className="space-y-3">
+          {data.signature ? (
+            <div className="relative inline-block">
+              <img
+                src={data.signature}
+                alt="Signature"
+                className="h-24 border border-border rounded-lg bg-background"
+              />
+              <Button
+                onClick={removeSignature}
+                size="icon"
+                variant="destructive"
+                className="absolute -top-2 -right-2 h-6 w-6"
+              >
+                <X className="h-3 w-3" />
+              </Button>
+            </div>
+          ) : (
+            <div>
+              <input
+                ref={signatureInputRef}
+                type="file"
+                accept="image/*"
+                onChange={handleSignatureUpload}
+                className="hidden"
+                id="signature-upload"
+              />
+              <Button
+                onClick={() => signatureInputRef.current?.click()}
+                variant="outline"
+                className="gap-2"
+              >
+                <Upload className="h-4 w-4" />
+                Upload Signature
+              </Button>
+            </div>
+          )}
         </div>
       </section>
     </div>
