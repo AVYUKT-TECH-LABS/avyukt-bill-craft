@@ -1,12 +1,13 @@
 import { InvoiceData } from "@/types/invoice";
 import { format } from "date-fns";
 import logo from "@/assets/avyukt-logo.webp";
+import { forwardRef } from "react";
 
 interface InvoicePreviewProps {
   data: InvoiceData;
 }
 
-export const InvoicePreview = ({ data }: InvoicePreviewProps) => {
+export const InvoicePreview = forwardRef<HTMLDivElement, InvoicePreviewProps>(({ data }, ref) => {
   const calculateItemTotal = (quantity: number, price: number) => {
     return quantity * price;
   };
@@ -50,21 +51,23 @@ export const InvoicePreview = ({ data }: InvoicePreviewProps) => {
   const total = calculateTotal();
 
   return (
-    <div className="bg-background border border-border rounded-lg shadow-lg p-8 max-w-4xl mx-auto relative overflow-hidden">
-      {/* Watermark */}
-      <div 
-        className="absolute inset-0 flex items-center justify-center pointer-events-none"
-        style={{ opacity: 0.15 }}
-      >
-        <img 
-          src={logo} 
-          alt="Watermark" 
-          className="w-[420px] h-auto object-contain"
-        />
-      </div>
+    <div className="bg-background border border-border rounded-lg shadow-lg overflow-hidden">
+      {/* PDF Content - this part gets captured */}
+      <div ref={ref} className="p-8 max-w-4xl mx-auto relative bg-white">
+        {/* Watermark */}
+        <div 
+          className="absolute inset-0 flex items-center justify-center pointer-events-none"
+          style={{ opacity: 0.15 }}
+        >
+          <img 
+            src={logo} 
+            alt="Watermark" 
+            className="w-[420px] h-auto object-contain"
+          />
+        </div>
 
-      {/* Content - with relative positioning to appear above watermark */}
-      <div className="relative z-10">
+        {/* Content - with relative positioning to appear above watermark */}
+        <div className="relative z-10">
         {/* Header with Logo */}
         <div className="flex justify-between items-start mb-8">
           <div className="flex-1">
@@ -265,6 +268,9 @@ export const InvoicePreview = ({ data }: InvoicePreviewProps) => {
           </div>
         </div>
       </div>
+      </div>
     </div>
   );
-};
+});
+
+InvoicePreview.displayName = "InvoicePreview";
