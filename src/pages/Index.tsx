@@ -119,8 +119,8 @@ const Index = () => {
             <div className="bg-muted/50 rounded-lg p-3 text-center">
               <p className="text-sm font-medium text-foreground">Live Preview</p>
             </div>
-            <div ref={previewRef}>
-              <InvoicePreview data={invoiceData} />
+            <div>
+              <InvoicePreview data={invoiceData} ref={previewRef} />
             </div>
           </div>
         </div>
