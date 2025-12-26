@@ -67,17 +67,18 @@ const Index = () => {
       const pdfHeight = pdf.internal.pageSize.getHeight();
       const imgWidth = canvas.width;
       const imgHeight = canvas.height;
-      const ratio = Math.min(pdfWidth / imgWidth, pdfHeight / imgHeight);
-      const imgX = (pdfWidth - imgWidth * ratio) / 2;
-      const imgY = 0;
+      
+      // Scale to fit full width of PDF
+      const ratio = pdfWidth / imgWidth;
+      const scaledHeight = imgHeight * ratio;
 
       pdf.addImage(
         imgData,
         "PNG",
-        imgX,
-        imgY,
-        imgWidth * ratio,
-        imgHeight * ratio
+        0,
+        0,
+        pdfWidth,
+        Math.min(scaledHeight, pdfHeight)
       );
 
       pdf.save(`Invoice_${invoiceData.invoiceNumber}.pdf`);
