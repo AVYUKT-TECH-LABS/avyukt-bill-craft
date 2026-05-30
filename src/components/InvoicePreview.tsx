@@ -214,7 +214,7 @@ export const InvoicePreview = forwardRef<HTMLDivElement, InvoicePreviewProps>(({
             )}
             {effIgst > 0 && (
               <div className="flex justify-between py-2 px-4 bg-invoice-header text-sm">
-                <span className="text-muted-foreground">IGST @ {data.igst}%</span>
+                <span className="text-muted-foreground">IGST @ {effIgst}%</span>
                 <span className="text-foreground">{formatCurrency(igstAmount)}</span>
               </div>
             )}
