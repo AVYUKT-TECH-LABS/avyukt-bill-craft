@@ -52,6 +52,7 @@ export const InvoiceForm = ({ data, onChange }: InvoiceFormProps) => {
       description: "",
       quantity: 1,
       price: 0,
+      taxable: true,
     };
     onChange({ ...data, items: [...data.items, newItem] });
   };
@@ -289,6 +290,21 @@ export const InvoiceForm = ({ data, onChange }: InvoiceFormProps) => {
                   value={item.price}
                   onChange={(e) => handleItemChange(index, "price", parseFloat(e.target.value) || 0)}
                 />
+              </div>
+              <div className="w-28 space-y-2">
+                <Label htmlFor={`item-tax-${index}`} className="text-xs">Taxable (GST)</Label>
+                <div className="h-10 flex items-center gap-2 px-3 border border-input rounded-md bg-background">
+                  <input
+                    id={`item-tax-${index}`}
+                    type="checkbox"
+                    checked={item.taxable !== false}
+                    onChange={(e) => handleItemChange(index, "taxable", e.target.checked as unknown as number)}
+                    className="h-4 w-4 cursor-pointer"
+                  />
+                  <span className="text-xs text-muted-foreground">
+                    {item.taxable !== false ? "Yes" : "No"}
+                  </span>
+                </div>
               </div>
               <Button
                 onClick={() => removeItem(index)}
