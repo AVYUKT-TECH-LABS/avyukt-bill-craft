@@ -161,7 +161,14 @@ export const InvoicePreview = forwardRef<HTMLDivElement, InvoicePreviewProps>(({
             <tbody>
               {data.items.map((item) => (
                 <tr key={item.id} className="border-b border-invoice-border">
-                  <td className="py-4 px-4 text-sm text-foreground">{item.description}</td>
+                  <td className="py-4 px-4 text-sm text-foreground">
+                    {item.description}
+                    {item.taxable === false && (
+                      <span className="ml-2 text-[10px] uppercase tracking-wide text-muted-foreground border border-border rounded px-1.5 py-0.5">
+                        Non-taxable
+                      </span>
+                    )}
+                  </td>
                   <td className="py-4 px-4 text-sm text-center text-foreground">{item.hsnSac || "-"}</td>
                   <td className="py-4 px-4 text-sm text-center text-foreground">{item.quantity}</td>
                   <td className="py-4 px-4 text-sm text-right text-foreground">{formatCurrency(item.price)}</td>
@@ -178,9 +185,15 @@ export const InvoicePreview = forwardRef<HTMLDivElement, InvoicePreviewProps>(({
         <div className="flex justify-end mb-8">
           <div className="w-96 space-y-1">
             <div className="flex justify-between py-2 px-4 text-sm">
-              <span className="font-medium text-foreground">Taxable Amount</span>
+              <span className="font-medium text-foreground">Subtotal</span>
               <span className="font-medium text-foreground">{formatCurrency(subtotal)}</span>
             </div>
+            {hasNonTaxable && (
+              <div className="flex justify-between py-2 px-4 text-sm">
+                <span className="text-muted-foreground">Taxable Amount</span>
+                <span className="text-foreground">{formatCurrency(taxableSubtotal)}</span>
+              </div>
+            )}
             {data.cgst > 0 && (
               <div className="flex justify-between py-2 px-4 bg-invoice-header text-sm">
                 <span className="text-muted-foreground">CGST @ {data.cgst}%</span>
