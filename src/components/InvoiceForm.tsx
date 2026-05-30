@@ -4,6 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Plus, Trash2, Upload, X } from "lucide-react";
 import { InvoiceData, InvoiceItem } from "@/types/invoice";
 import { useRef } from "react";
+import { StateSelect } from "@/components/StateSelect";
 
 interface InvoiceFormProps {
   data: InvoiceData;
@@ -131,11 +132,10 @@ export const InvoiceForm = ({ data, onChange }: InvoiceFormProps) => {
           </div>
           <div className="space-y-2">
             <Label htmlFor="companyState">State</Label>
-            <Input
+            <StateSelect
               id="companyState"
               value={data.companyState}
-              onChange={(e) => handleInputChange("companyState", e.target.value)}
-              placeholder="Delhi"
+              onChange={(v) => handleInputChange("companyState", v)}
             />
           </div>
           <div className="space-y-2">
@@ -230,11 +230,10 @@ export const InvoiceForm = ({ data, onChange }: InvoiceFormProps) => {
           </div>
           <div className="space-y-2">
             <Label htmlFor="clientState">Client State (Optional)</Label>
-            <Input
+            <StateSelect
               id="clientState"
               value={data.clientState || ""}
-              onChange={(e) => handleInputChange("clientState", e.target.value)}
-              placeholder="State Name"
+              onChange={(v) => handleInputChange("clientState", v)}
             />
           </div>
         </div>
@@ -320,50 +319,68 @@ export const InvoiceForm = ({ data, onChange }: InvoiceFormProps) => {
       </section>
 
       {/* Tax Settings */}
-      <section className="space-y-4">
-        <h2 className="text-xl font-semibold text-foreground">GST/Tax Details</h2>
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-          <div className="space-y-2">
-            <Label htmlFor="cgst">CGST (%)</Label>
-            <Input
-              id="cgst"
-              type="number"
-              min="0"
-              max="100"
-              step="0.01"
-              value={data.cgst}
-              onChange={(e) => handleTaxChange("cgst", e.target.value)}
-            />
-          </div>
-          <div className="space-y-2">
-            <Label htmlFor="sgst">SGST (%)</Label>
-            <Input
-              id="sgst"
-              type="number"
-              min="0"
-              max="100"
-              step="0.01"
-              value={data.sgst}
-              onChange={(e) => handleTaxChange("sgst", e.target.value)}
-            />
-          </div>
-          <div className="space-y-2">
-            <Label htmlFor="igst">IGST (%)</Label>
-            <Input
-              id="igst"
-              type="number"
-              min="0"
-              max="100"
-              step="0.01"
-              value={data.igst}
-              onChange={(e) => handleTaxChange("igst", e.target.value)}
-            />
-          </div>
-        </div>
-        <p className="text-xs text-muted-foreground">
-          Note: Use CGST + SGST for intra-state or IGST for inter-state transactions
-        </p>
-      </section>
+      {(() => {
+        const isIntraState =
+          !!data.clientState &&
+          data.clientState.trim().toLowerCase() === "delhi";
+        return (
+          <section className="space-y-4">
+            <div className="flex items-center justify-between flex-wrap gap-2">
+              <h2 className="text-xl font-semibold text-foreground">GST/Tax Details</h2>
+              <span className="text-xs px-2 py-1 rounded bg-muted text-muted-foreground">
+                {data.clientState
+                  ? isIntraState
+                    ? "Intra-state (Delhi) — CGST + SGST"
+                    : `Inter-state (${data.clientState}) — IGST`
+                  : "Select client state to determine tax type"}
+              </span>
+            </div>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              {isIntraState ? (
+                <>
+                  <div className="space-y-2">
+                    <Label htmlFor="cgst">CGST (%)</Label>
+                    <Input
+                      id="cgst"
+                      type="number"
+                      min="0"
+                      max="100"
+                      step="0.01"
+                      value={data.cgst}
+                      onChange={(e) => handleTaxChange("cgst", e.target.value)}
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <Label htmlFor="sgst">SGST (%)</Label>
+                    <Input
+                      id="sgst"
+                      type="number"
+                      min="0"
+                      max="100"
+                      step="0.01"
+                      value={data.sgst}
+                      onChange={(e) => handleTaxChange("sgst", e.target.value)}
+                    />
+                  </div>
+                </>
+              ) : (
+                <div className="space-y-2">
+                  <Label htmlFor="igst">IGST (%)</Label>
+                  <Input
+                    id="igst"
+                    type="number"
+                    min="0"
+                    max="100"
+                    step="0.01"
+                    value={data.igst}
+                    onChange={(e) => handleTaxChange("igst", e.target.value)}
+                  />
+                </div>
+              )}
+            </div>
+          </section>
+        );
+      })()}
 
       {/* Bank Details */}
       <section className="space-y-4">

@@ -51,12 +51,18 @@ export const InvoicePreview = forwardRef<HTMLDivElement, InvoicePreviewProps>(({
     }
   };
 
+  const isIntraState =
+    !!data.clientState && data.clientState.trim().toLowerCase() === "delhi";
+  const effCgst = isIntraState ? data.cgst : 0;
+  const effSgst = isIntraState ? data.sgst : 0;
+  const effIgst = isIntraState ? 0 : data.igst;
+
   const subtotal = calculateSubtotal();
   const taxableSubtotal = calculateTaxableSubtotal();
-  const cgstAmount = calculateTaxAmount(taxableSubtotal, data.cgst);
-  const sgstAmount = calculateTaxAmount(taxableSubtotal, data.sgst);
-  const igstAmount = calculateTaxAmount(taxableSubtotal, data.igst);
-  const total = calculateTotal();
+  const cgstAmount = calculateTaxAmount(taxableSubtotal, effCgst);
+  const sgstAmount = calculateTaxAmount(taxableSubtotal, effSgst);
+  const igstAmount = calculateTaxAmount(taxableSubtotal, effIgst);
+  const total = subtotal + cgstAmount + sgstAmount + igstAmount;
   const hasNonTaxable = data.items.some((item) => item.taxable === false);
 
   return (
@@ -194,21 +200,21 @@ export const InvoicePreview = forwardRef<HTMLDivElement, InvoicePreviewProps>(({
                 <span className="text-foreground">{formatCurrency(taxableSubtotal)}</span>
               </div>
             )}
-            {data.cgst > 0 && (
+            {effCgst > 0 && (
               <div className="flex justify-between py-2 px-4 bg-invoice-header text-sm">
-                <span className="text-muted-foreground">CGST @ {data.cgst}%</span>
+                <span className="text-muted-foreground">CGST @ {effCgst}%</span>
                 <span className="text-foreground">{formatCurrency(cgstAmount)}</span>
               </div>
             )}
-            {data.sgst > 0 && (
+            {effSgst > 0 && (
               <div className="flex justify-between py-2 px-4 bg-invoice-header text-sm">
-                <span className="text-muted-foreground">SGST @ {data.sgst}%</span>
+                <span className="text-muted-foreground">SGST @ {effSgst}%</span>
                 <span className="text-foreground">{formatCurrency(sgstAmount)}</span>
               </div>
             )}
-            {data.igst > 0 && (
+            {effIgst > 0 && (
               <div className="flex justify-between py-2 px-4 bg-invoice-header text-sm">
-                <span className="text-muted-foreground">IGST @ {data.igst}%</span>
+                <span className="text-muted-foreground">IGST @ {effIgst}%</span>
                 <span className="text-foreground">{formatCurrency(igstAmount)}</span>
               </div>
             )}
