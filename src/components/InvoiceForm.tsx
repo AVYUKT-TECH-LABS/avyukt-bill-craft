@@ -4,6 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Plus, Trash2, Upload, X } from "lucide-react";
 import { InvoiceData, InvoiceItem } from "@/types/invoice";
 import { useRef } from "react";
+import { StateSelect } from "@/components/StateSelect";
 
 interface InvoiceFormProps {
   data: InvoiceData;
@@ -131,11 +132,10 @@ export const InvoiceForm = ({ data, onChange }: InvoiceFormProps) => {
           </div>
           <div className="space-y-2">
             <Label htmlFor="companyState">State</Label>
-            <Input
+            <StateSelect
               id="companyState"
               value={data.companyState}
-              onChange={(e) => handleInputChange("companyState", e.target.value)}
-              placeholder="Delhi"
+              onChange={(v) => handleInputChange("companyState", v)}
             />
           </div>
           <div className="space-y-2">
@@ -230,11 +230,10 @@ export const InvoiceForm = ({ data, onChange }: InvoiceFormProps) => {
           </div>
           <div className="space-y-2">
             <Label htmlFor="clientState">Client State (Optional)</Label>
-            <Input
+            <StateSelect
               id="clientState"
               value={data.clientState || ""}
-              onChange={(e) => handleInputChange("clientState", e.target.value)}
-              placeholder="State Name"
+              onChange={(v) => handleInputChange("clientState", v)}
             />
           </div>
         </div>
