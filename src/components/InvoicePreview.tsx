@@ -16,15 +16,22 @@ export const InvoicePreview = forwardRef<HTMLDivElement, InvoicePreviewProps>(({
     return data.items.reduce((sum, item) => sum + calculateItemTotal(item.quantity, item.price), 0);
   };
 
-  const calculateTaxAmount = (subtotal: number, rate: number) => {
-    return (subtotal * rate) / 100;
+  const calculateTaxableSubtotal = () => {
+    return data.items
+      .filter((item) => item.taxable !== false)
+      .reduce((sum, item) => sum + calculateItemTotal(item.quantity, item.price), 0);
+  };
+
+  const calculateTaxAmount = (taxable: number, rate: number) => {
+    return (taxable * rate) / 100;
   };
 
   const calculateTotal = () => {
     const subtotal = calculateSubtotal();
-    const cgstAmount = calculateTaxAmount(subtotal, data.cgst);
-    const sgstAmount = calculateTaxAmount(subtotal, data.sgst);
-    const igstAmount = calculateTaxAmount(subtotal, data.igst);
+    const taxableSubtotal = calculateTaxableSubtotal();
+    const cgstAmount = calculateTaxAmount(taxableSubtotal, data.cgst);
+    const sgstAmount = calculateTaxAmount(taxableSubtotal, data.sgst);
+    const igstAmount = calculateTaxAmount(taxableSubtotal, data.igst);
     return subtotal + cgstAmount + sgstAmount + igstAmount;
   };
 
@@ -45,10 +52,12 @@ export const InvoicePreview = forwardRef<HTMLDivElement, InvoicePreviewProps>(({
   };
 
   const subtotal = calculateSubtotal();
-  const cgstAmount = calculateTaxAmount(subtotal, data.cgst);
-  const sgstAmount = calculateTaxAmount(subtotal, data.sgst);
-  const igstAmount = calculateTaxAmount(subtotal, data.igst);
+  const taxableSubtotal = calculateTaxableSubtotal();
+  const cgstAmount = calculateTaxAmount(taxableSubtotal, data.cgst);
+  const sgstAmount = calculateTaxAmount(taxableSubtotal, data.sgst);
+  const igstAmount = calculateTaxAmount(taxableSubtotal, data.igst);
   const total = calculateTotal();
+  const hasNonTaxable = data.items.some((item) => item.taxable === false);
 
   return (
     <div className="bg-background border border-border rounded-lg shadow-lg overflow-hidden">

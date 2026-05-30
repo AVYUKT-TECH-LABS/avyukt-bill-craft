@@ -29,6 +29,7 @@ const Index = () => {
         hsnSac: "",
         quantity: 1,
         price: 0,
+        taxable: true,
       },
     ],
     cgst: 9,

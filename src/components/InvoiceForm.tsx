@@ -35,7 +35,7 @@ export const InvoiceForm = ({ data, onChange }: InvoiceFormProps) => {
     }
   };
 
-  const handleItemChange = (index: number, field: keyof InvoiceItem, value: string | number) => {
+  const handleItemChange = (index: number, field: keyof InvoiceItem, value: string | number | boolean) => {
     const newItems = [...data.items];
     newItems[index] = { ...newItems[index], [field]: value };
     onChange({ ...data, items: newItems });
