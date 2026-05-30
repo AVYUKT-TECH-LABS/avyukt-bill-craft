@@ -4,6 +4,7 @@ export interface InvoiceItem {
   hsnSac?: string;
   quantity: number;
   price: number;
+  taxable: boolean;
 }
 
 export interface InvoiceData {
