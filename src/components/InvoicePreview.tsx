@@ -104,6 +104,11 @@ export const InvoicePreview = forwardRef<HTMLDivElement, InvoicePreviewProps>(({
                   <span className="font-medium">PAN:</span> {data.companyPAN}
                 </p>
               )}
+              {data.companyCIN && (
+                <p className="text-muted-foreground">
+                  <span className="font-medium">CIN:</span> {data.companyCIN}
+                </p>
+              )}
               <p className="text-muted-foreground">
                 <span className="font-medium">Phone:</span> {data.companyPhone}
               </p>

@@ -184,6 +184,15 @@ export const InvoiceForm = ({ data, onChange }: InvoiceFormProps) => {
               placeholder="AAAAA0000A"
             />
           </div>
+          <div className="space-y-2">
+            <Label htmlFor="companyCIN">CIN (Optional)</Label>
+            <Input
+              id="companyCIN"
+              value={data.companyCIN || ""}
+              onChange={(e) => handleInputChange("companyCIN", e.target.value)}
+              placeholder="U72200DL2016PTC290922"
+            />
+          </div>
         </div>
       </section>
 
