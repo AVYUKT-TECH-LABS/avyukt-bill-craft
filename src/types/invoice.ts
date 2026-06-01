@@ -22,6 +22,7 @@ export interface InvoiceData {
   companyEmail: string;
   companyGSTIN?: string;
   companyPAN?: string;
+  companyCIN?: string;
   
   // Client details
   clientName: string;
