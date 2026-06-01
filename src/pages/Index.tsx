@@ -1,46 +1,76 @@
-import { useState, useRef } from "react";
+import { useState, useRef, useEffect } from "react";
 import { InvoiceForm } from "@/components/InvoiceForm";
 import { InvoicePreview } from "@/components/InvoicePreview";
 import { InvoiceData } from "@/types/invoice";
 import { Button } from "@/components/ui/button";
-import { FileDown } from "lucide-react";
+import { FileDown, RotateCcw } from "lucide-react";
 import { toast } from "sonner";
 import html2canvas from "html2canvas";
 import jsPDF from "jspdf";
 
+const STORAGE_KEY = "avyukt_invoice_data";
+
+const getDefaultInvoiceData = (): InvoiceData => ({
+  invoiceNumber: "AVTL" + new Date().getTime().toString().slice(-6),
+  date: new Date().toISOString().split("T")[0],
+  dueDate: new Date(Date.now() + 3 * 24 * 60 * 60 * 1000).toISOString().split("T")[0],
+  companyName: "AVYUKT TECH LABS PRIVATE LIMITED",
+  companyAddress: "A-7, Flat no. 8, 2nd Floor, Jawahar Park, Khapnur",
+  companyCity: "New Delhi",
+  companyState: "Delhi",
+  companyZip: "110062",
+  companyPhone: "8178392040",
+  companyEmail: "divyansh@avyuktlabs.in",
+  clientName: "",
+  clientEmail: "",
+  items: [
+    {
+      id: "1",
+      description: "",
+      hsnSac: "",
+      quantity: 1,
+      price: 0,
+      taxable: true,
+    },
+  ],
+  cgst: 9,
+  sgst: 9,
+  igst: 0,
+  bankName: "",
+  accountNumber: "",
+  ifscCode: "",
+  paymentLink: "",
+  notes: "",
+});
+
 const Index = () => {
-  const [invoiceData, setInvoiceData] = useState<InvoiceData>({
-    invoiceNumber: "AVTL" + new Date().getTime().toString().slice(-6),
-    date: new Date().toISOString().split("T")[0],
-    dueDate: new Date(Date.now() + 3 * 24 * 60 * 60 * 1000).toISOString().split("T")[0],
-    companyName: "AVYUKT TECH LABS PRIVATE LIMITED",
-    companyAddress: "A-7, Flat no. 8, 2nd Floor, Jawahar Park, Khapnur",
-    companyCity: "New Delhi",
-    companyState: "Delhi",
-    companyZip: "110062",
-    companyPhone: "8178392040",
-    companyEmail: "divyansh@avyuktlabs.in",
-    clientName: "",
-    clientEmail: "",
-    items: [
-      {
-        id: "1",
-        description: "",
-        hsnSac: "",
-        quantity: 1,
-        price: 0,
-        taxable: true,
-      },
-    ],
-    cgst: 9,
-    sgst: 9,
-    igst: 0,
-    bankName: "",
-    accountNumber: "",
-    ifscCode: "",
-    paymentLink: "",
-    notes: "",
+  const [invoiceData, setInvoiceData] = useState<InvoiceData>(() => {
+    try {
+      const saved = localStorage.getItem(STORAGE_KEY);
+      if (saved) {
+        return { ...getDefaultInvoiceData(), ...JSON.parse(saved) };
+      }
+    } catch (e) {
+      console.error("Failed to load saved invoice", e);
+    }
+    return getDefaultInvoiceData();
   });
+
+  useEffect(() => {
+    try {
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(invoiceData));
+    } catch (e) {
+      console.error("Failed to save invoice", e);
+    }
+  }, [invoiceData]);
+
+  const handleReset = () => {
+    if (confirm("Reset the form to default values? Your current changes will be lost.")) {
+      localStorage.removeItem(STORAGE_KEY);
+      setInvoiceData(getDefaultInvoiceData());
+      toast.success("Form reset to defaults");
+    }
+  };
 
   const previewRef = useRef<HTMLDivElement>(null);
 
