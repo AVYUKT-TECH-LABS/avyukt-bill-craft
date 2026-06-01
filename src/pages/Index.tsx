@@ -130,10 +130,16 @@ const Index = () => {
               <h1 className="text-2xl font-bold text-foreground">Invoice Generator</h1>
               <p className="text-sm text-muted-foreground">Create professional invoices in seconds</p>
             </div>
-            <Button onClick={handleDownloadPDF} className="gap-2">
-              <FileDown className="h-4 w-4" />
-              Download PDF
-            </Button>
+            <div className="flex gap-2">
+              <Button onClick={handleReset} variant="outline" className="gap-2">
+                <RotateCcw className="h-4 w-4" />
+                Reset
+              </Button>
+              <Button onClick={handleDownloadPDF} className="gap-2">
+                <FileDown className="h-4 w-4" />
+                Download PDF
+              </Button>
+            </div>
           </div>
         </div>
       </header>
