@@ -2,46 +2,19 @@ import { InvoiceData } from "@/types/invoice";
 import { format } from "date-fns";
 import logo from "@/assets/avyukt-logo.webp";
 import { forwardRef } from "react";
+import {
+  calculateItemTotal,
+  calculateSubtotal,
+  calculateTaxableSubtotal,
+  calculateTaxAmount,
+  formatCurrency,
+} from "@/lib/invoiceCalc";
 
 interface InvoicePreviewProps {
   data: InvoiceData;
 }
 
 export const InvoicePreview = forwardRef<HTMLDivElement, InvoicePreviewProps>(({ data }, ref) => {
-  const calculateItemTotal = (quantity: number, price: number) => {
-    return quantity * price;
-  };
-
-  const calculateSubtotal = () => {
-    return data.items.reduce((sum, item) => sum + calculateItemTotal(item.quantity, item.price), 0);
-  };
-
-  const calculateTaxableSubtotal = () => {
-    return data.items
-      .filter((item) => item.taxable !== false)
-      .reduce((sum, item) => sum + calculateItemTotal(item.quantity, item.price), 0);
-  };
-
-  const calculateTaxAmount = (taxable: number, rate: number) => {
-    return (taxable * rate) / 100;
-  };
-
-  const calculateTotal = () => {
-    const subtotal = calculateSubtotal();
-    const taxableSubtotal = calculateTaxableSubtotal();
-    const cgstAmount = calculateTaxAmount(taxableSubtotal, data.cgst);
-    const sgstAmount = calculateTaxAmount(taxableSubtotal, data.sgst);
-    const igstAmount = calculateTaxAmount(taxableSubtotal, data.igst);
-    return subtotal + cgstAmount + sgstAmount + igstAmount;
-  };
-
-  const formatCurrency = (amount: number) => {
-    return new Intl.NumberFormat("en-IN", {
-      style: "currency",
-      currency: "INR",
-    }).format(amount);
-  };
-
   const formatDate = (dateString: string) => {
     if (!dateString) return "";
     try {
@@ -57,8 +30,8 @@ export const InvoicePreview = forwardRef<HTMLDivElement, InvoicePreviewProps>(({
   const effSgst = isIntraState ? data.sgst : 0;
   const effIgst = isIntraState ? 0 : data.igst;
 
-  const subtotal = calculateSubtotal();
-  const taxableSubtotal = calculateTaxableSubtotal();
+  const subtotal = calculateSubtotal(data);
+  const taxableSubtotal = calculateTaxableSubtotal(data);
   const cgstAmount = calculateTaxAmount(taxableSubtotal, effCgst);
   const sgstAmount = calculateTaxAmount(taxableSubtotal, effSgst);
   const igstAmount = calculateTaxAmount(taxableSubtotal, effIgst);

@@ -4,7 +4,6 @@ import { Button } from "@/components/ui/button";
 import { Plus, Trash2, Upload, X } from "lucide-react";
 import { InvoiceData, InvoiceItem } from "@/types/invoice";
 import { useRef } from "react";
-import { StateSelect } from "@/components/StateSelect";
 
 interface InvoiceFormProps {
   data: InvoiceData;
@@ -99,152 +98,15 @@ export const InvoiceForm = ({ data, onChange }: InvoiceFormProps) => {
         </div>
       </section>
 
-      {/* Company Details */}
-      <section className="space-y-4">
-        <h2 className="text-xl font-semibold text-foreground">Your Company Details</h2>
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <div className="space-y-2">
-            <Label htmlFor="companyName">Company Name</Label>
-            <Input
-              id="companyName"
-              value={data.companyName}
-              onChange={(e) => handleInputChange("companyName", e.target.value)}
-              placeholder="AVYUKT TECH LABS PRIVATE LIMITED"
-            />
-          </div>
-          <div className="space-y-2">
-            <Label htmlFor="companyAddress">Address</Label>
-            <Input
-              id="companyAddress"
-              value={data.companyAddress}
-              onChange={(e) => handleInputChange("companyAddress", e.target.value)}
-              placeholder="A-7, Flat no. 8, 2nd Floor, Jawahar Park"
-            />
-          </div>
-          <div className="space-y-2">
-            <Label htmlFor="companyCity">City</Label>
-            <Input
-              id="companyCity"
-              value={data.companyCity}
-              onChange={(e) => handleInputChange("companyCity", e.target.value)}
-              placeholder="New Delhi"
-            />
-          </div>
-          <div className="space-y-2">
-            <Label htmlFor="companyState">State</Label>
-            <StateSelect
-              id="companyState"
-              value={data.companyState}
-              onChange={(v) => handleInputChange("companyState", v)}
-            />
-          </div>
-          <div className="space-y-2">
-            <Label htmlFor="companyZip">ZIP Code</Label>
-            <Input
-              id="companyZip"
-              value={data.companyZip}
-              onChange={(e) => handleInputChange("companyZip", e.target.value)}
-              placeholder="110062"
-            />
-          </div>
-          <div className="space-y-2">
-            <Label htmlFor="companyPhone">Phone</Label>
-            <Input
-              id="companyPhone"
-              value={data.companyPhone}
-              onChange={(e) => handleInputChange("companyPhone", e.target.value)}
-              placeholder="8178392040"
-            />
-          </div>
-          <div className="space-y-2">
-            <Label htmlFor="companyEmail">Email</Label>
-            <Input
-              id="companyEmail"
-              type="email"
-              value={data.companyEmail}
-              onChange={(e) => handleInputChange("companyEmail", e.target.value)}
-              placeholder="divyansh@avyuktlabs.in"
-            />
-          </div>
-          <div className="space-y-2">
-            <Label htmlFor="companyGSTIN">GSTIN (Optional)</Label>
-            <Input
-              id="companyGSTIN"
-              value={data.companyGSTIN || ""}
-              onChange={(e) => handleInputChange("companyGSTIN", e.target.value)}
-              placeholder="22AAAAA0000A1Z5"
-            />
-          </div>
-          <div className="space-y-2">
-            <Label htmlFor="companyPAN">PAN (Optional)</Label>
-            <Input
-              id="companyPAN"
-              value={data.companyPAN || ""}
-              onChange={(e) => handleInputChange("companyPAN", e.target.value)}
-              placeholder="AAAAA0000A"
-            />
-          </div>
-          <div className="space-y-2">
-            <Label htmlFor="companyCIN">CIN (Optional)</Label>
-            <Input
-              id="companyCIN"
-              value={data.companyCIN || ""}
-              onChange={(e) => handleInputChange("companyCIN", e.target.value)}
-              placeholder="U72200DL2016PTC290922"
-            />
-          </div>
-        </div>
-      </section>
-
-      {/* Client Details */}
+      {/* Bill To — read-only, sourced from the linked client */}
       <section className="space-y-4">
         <h2 className="text-xl font-semibold text-foreground">Bill To</h2>
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <div className="space-y-2">
-            <Label htmlFor="clientName">Client Name</Label>
-            <Input
-              id="clientName"
-              value={data.clientName}
-              onChange={(e) => handleInputChange("clientName", e.target.value)}
-              placeholder="Client Company Name"
-            />
-          </div>
-          <div className="space-y-2">
-            <Label htmlFor="clientEmail">Client Email</Label>
-            <Input
-              id="clientEmail"
-              type="email"
-              value={data.clientEmail}
-              onChange={(e) => handleInputChange("clientEmail", e.target.value)}
-              placeholder="client@example.com"
-            />
-          </div>
-          <div className="space-y-2">
-            <Label htmlFor="clientGSTIN">Client GSTIN (Optional)</Label>
-            <Input
-              id="clientGSTIN"
-              value={data.clientGSTIN || ""}
-              onChange={(e) => handleInputChange("clientGSTIN", e.target.value)}
-              placeholder="22AAAAA0000A1Z5"
-            />
-          </div>
-          <div className="space-y-2">
-            <Label htmlFor="clientAddress">Client Address (Optional)</Label>
-            <Input
-              id="clientAddress"
-              value={data.clientAddress || ""}
-              onChange={(e) => handleInputChange("clientAddress", e.target.value)}
-              placeholder="Full Address"
-            />
-          </div>
-          <div className="space-y-2">
-            <Label htmlFor="clientState">Client State (Optional)</Label>
-            <StateSelect
-              id="clientState"
-              value={data.clientState || ""}
-              onChange={(v) => handleInputChange("clientState", v)}
-            />
-          </div>
+        <div className="p-4 bg-muted/30 rounded-lg border border-border space-y-1 text-sm">
+          <p className="font-semibold text-foreground">{data.clientName}</p>
+          {data.clientAddress && <p className="text-muted-foreground">{data.clientAddress}</p>}
+          {data.clientState && <p className="text-muted-foreground">{data.clientState}</p>}
+          {data.clientGSTIN && <p className="text-muted-foreground">GSTIN: {data.clientGSTIN}</p>}
+          {data.clientEmail && <p className="text-muted-foreground">{data.clientEmail}</p>}
         </div>
       </section>
 
