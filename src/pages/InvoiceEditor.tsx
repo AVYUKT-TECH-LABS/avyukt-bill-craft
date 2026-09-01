@@ -30,7 +30,7 @@ import {
   Invoice,
   RecurringSchedule,
 } from "@/lib/api";
-import { FileDown, Save } from "lucide-react";
+import { FileDown, RefreshCw, Save } from "lucide-react";
 import { toast } from "sonner";
 
 const buildDefaultItems = () => [
@@ -205,6 +205,29 @@ const InvoiceEditor = () => {
     }
   };
 
+  const handleRefreshCompanyInfo = async () => {
+    if (!data) return;
+    try {
+      const company = await getCompanySettings();
+      setData({
+        ...data,
+        companyName: company.company_name,
+        companyAddress: company.company_address,
+        companyCity: company.company_city,
+        companyState: company.company_state,
+        companyZip: company.company_zip,
+        companyPhone: company.company_phone,
+        companyEmail: company.company_email,
+        companyGSTIN: company.company_gstin || undefined,
+        companyPAN: company.company_pan || undefined,
+        companyCIN: company.company_cin || undefined,
+      });
+      toast.success("Company info refreshed — remember to Save");
+    } catch (e) {
+      toast.error(e instanceof Error ? e.message : "Failed to refresh company info");
+    }
+  };
+
   const handleDownloadReceipt = async () => {
     if (!invoice?.receipt_url) return;
     const url = await getReceiptSignedUrl(invoice.receipt_url);
@@ -234,6 +257,12 @@ const InvoiceEditor = () => {
             <Button onClick={handleDownloadReceipt} variant="outline" className="gap-2">
               <FileDown className="h-4 w-4" />
               Download Receipt
+            </Button>
+          )}
+          {!isCreate && (
+            <Button onClick={handleRefreshCompanyInfo} variant="outline" className="gap-2">
+              <RefreshCw className="h-4 w-4" />
+              Use Latest Company Info
             </Button>
           )}
           <Button onClick={handleDownloadPDF} variant="outline" className="gap-2">
