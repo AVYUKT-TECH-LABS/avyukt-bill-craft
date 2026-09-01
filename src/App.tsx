@@ -12,6 +12,7 @@ import Clients from "./pages/Clients";
 import ClientDetail from "./pages/ClientDetail";
 import ProjectDetail from "./pages/ProjectDetail";
 import InvoiceEditor from "./pages/InvoiceEditor";
+import Settings from "./pages/Settings";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -33,6 +34,7 @@ const App = () => (
                 <Route path="/clients/:clientId/projects/:projectId" element={<ProjectDetail />} />
                 <Route path="/invoices/new" element={<InvoiceEditor />} />
                 <Route path="/invoices/:invoiceId" element={<InvoiceEditor />} />
+                <Route path="/settings" element={<Settings />} />
               </Route>
             </Route>
             {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}

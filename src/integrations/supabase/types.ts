@@ -44,6 +44,51 @@ export type Database = {
         }
         Relationships: []
       }
+      company_settings: {
+        Row: {
+          company_address: string
+          company_cin: string | null
+          company_city: string
+          company_email: string
+          company_gstin: string | null
+          company_name: string
+          company_pan: string | null
+          company_phone: string
+          company_state: string
+          company_zip: string
+          id: string
+          updated_at: string
+        }
+        Insert: {
+          company_address: string
+          company_cin?: string | null
+          company_city: string
+          company_email: string
+          company_gstin?: string | null
+          company_name: string
+          company_pan?: string | null
+          company_phone: string
+          company_state: string
+          company_zip: string
+          id?: string
+          updated_at?: string
+        }
+        Update: {
+          company_address?: string
+          company_cin?: string | null
+          company_city?: string
+          company_email?: string
+          company_gstin?: string | null
+          company_name?: string
+          company_pan?: string | null
+          company_phone?: string
+          company_state?: string
+          company_zip?: string
+          id?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       invoices: {
         Row: {
           created_at: string

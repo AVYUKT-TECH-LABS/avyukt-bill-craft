@@ -21,6 +21,9 @@ export const AppLayout = () => {
             <NavLink to="/clients" className={navLinkClass} activeClassName={activeNavLinkClass}>
               Clients
             </NavLink>
+            <NavLink to="/settings" className={navLinkClass} activeClassName={activeNavLinkClass}>
+              Settings
+            </NavLink>
           </nav>
           <Button variant="outline" size="sm" className="gap-2" onClick={() => supabase.auth.signOut()}>
             <LogOut className="h-4 w-4" />

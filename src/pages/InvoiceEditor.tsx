@@ -11,11 +11,11 @@ import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { InvoiceData } from "@/types/invoice";
-import { COMPANY } from "@/lib/company";
 import { nextInvoiceNumber } from "@/lib/invoiceNumber";
 import {
   getProject,
   getClient,
+  getCompanySettings,
   getInvoice,
   createInvoice,
   updateInvoiceData,
@@ -65,13 +65,23 @@ const InvoiceEditor = () => {
         }
         const project = await getProject(projectId);
         const client = await getClient(project.client_id);
+        const company = await getCompanySettings();
         const today = new Date();
         const count = await countInvoicesOnDate(format(today, "yyyy-MM-dd"));
         setData({
           invoiceNumber: nextInvoiceNumber(today, count),
           date: format(today, "yyyy-MM-dd"),
           dueDate: format(addDays(today, 3), "yyyy-MM-dd"),
-          ...COMPANY,
+          companyName: company.company_name,
+          companyAddress: company.company_address,
+          companyCity: company.company_city,
+          companyState: company.company_state,
+          companyZip: company.company_zip,
+          companyPhone: company.company_phone,
+          companyEmail: company.company_email,
+          companyGSTIN: company.company_gstin || undefined,
+          companyPAN: company.company_pan || undefined,
+          companyCIN: company.company_cin || undefined,
           clientName: client.name,
           clientEmail: client.email || "",
           clientGSTIN: client.gstin || undefined,

@@ -1,11 +1,31 @@
 import { supabase } from "@/integrations/supabase/client";
-import { Tables, TablesInsert } from "@/integrations/supabase/types";
+import { Tables, TablesInsert, TablesUpdate } from "@/integrations/supabase/types";
 import { InvoiceData } from "@/types/invoice";
 
 export type Client = Tables<"clients">;
 export type Project = Tables<"projects">;
 export type Invoice = Omit<Tables<"invoices">, "data"> & { data: InvoiceData };
 export type RecurringSchedule = Tables<"recurring_schedules">;
+export type CompanySettings = Tables<"company_settings">;
+
+// Company settings (single row)
+
+export const getCompanySettings = async () => {
+  const { data, error } = await supabase.from("company_settings").select("*").limit(1).single();
+  if (error) throw error;
+  return data;
+};
+
+export const updateCompanySettings = async (id: string, input: TablesUpdate<"company_settings">) => {
+  const { data, error } = await supabase
+    .from("company_settings")
+    .update(input)
+    .eq("id", id)
+    .select()
+    .single();
+  if (error) throw error;
+  return data;
+};
 
 // Clients
 
