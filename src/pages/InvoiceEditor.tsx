@@ -251,6 +251,8 @@ const InvoiceEditor = () => {
 
   if (loading || !data) return <p className="text-muted-foreground">Loading...</p>;
 
+  const isPaid = invoice?.status === "paid";
+
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between flex-wrap gap-3">
@@ -268,6 +270,11 @@ const InvoiceEditor = () => {
           <button onClick={() => navigate(-1)} className="text-sm text-primary hover:underline">
             &larr; Back
           </button>
+          {isPaid && invoice.paid_at && (
+            <p className="text-sm text-muted-foreground mt-1">
+              Paid on {format(new Date(invoice.paid_at), "MMM dd, yyyy 'at' h:mm a")}
+            </p>
+          )}
         </div>
         <div className="flex gap-2 flex-wrap">
           {invoice?.status === "draft" && (
@@ -291,7 +298,7 @@ const InvoiceEditor = () => {
               Download Receipt
             </Button>
           )}
-          {!isCreate && (
+          {!isCreate && !isPaid && (
             <Button onClick={handleRefreshCompanyInfo} variant="outline" className="gap-2">
               <RefreshCw className="h-4 w-4" />
               Use Latest Company Info
@@ -301,45 +308,61 @@ const InvoiceEditor = () => {
             <FileDown className="h-4 w-4" />
             Download PDF
           </Button>
-          <Button onClick={handleSave} disabled={saving} className="gap-2">
-            <Save className="h-4 w-4" />
-            {saving ? "Saving..." : "Save"}
-          </Button>
+          {!isPaid && (
+            <Button onClick={handleSave} disabled={saving} className="gap-2">
+              <Save className="h-4 w-4" />
+              {saving ? "Saving..." : "Save"}
+            </Button>
+          )}
         </div>
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        <div className="bg-background rounded-lg shadow-lg p-6 h-fit space-y-8">
-          <InvoiceForm data={data} onChange={setData} />
-
-          <section className="space-y-4 border-t border-border pt-6">
-            <div className="flex items-center justify-between">
-              <div>
-                <Label htmlFor="recurring-toggle">Recurring Invoice</Label>
-                <p className="text-xs text-muted-foreground">
-                  Auto-generate a new invoice on this schedule from {data.date}.
-                </p>
-              </div>
-              <Switch id="recurring-toggle" checked={makeRecurring} onCheckedChange={setMakeRecurring} />
-            </div>
-            {makeRecurring && (
-              <div className="space-y-2 max-w-xs">
-                <Label htmlFor="frequency">Frequency</Label>
-                <Select value={frequency} onValueChange={(v) => setFrequency(v as typeof frequency)}>
-                  <SelectTrigger id="frequency">
-                    <SelectValue />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="weekly">Weekly</SelectItem>
-                    <SelectItem value="monthly">Monthly</SelectItem>
-                    <SelectItem value="quarterly">Quarterly</SelectItem>
-                    <SelectItem value="yearly">Yearly</SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
+        {isPaid ? (
+          <div className="bg-background rounded-lg shadow-lg p-6 h-fit space-y-2">
+            <h2 className="text-lg font-semibold text-foreground">Payment Info</h2>
+            {invoice.paid_at && (
+              <p className="text-sm text-muted-foreground">
+                Paid on {format(new Date(invoice.paid_at), "MMM dd, yyyy 'at' h:mm a")}
+              </p>
             )}
-          </section>
-        </div>
+            <p className="text-sm text-muted-foreground">
+              This invoice is paid and can no longer be edited.
+            </p>
+          </div>
+        ) : (
+          <div className="bg-background rounded-lg shadow-lg p-6 h-fit space-y-8">
+            <InvoiceForm data={data} onChange={setData} />
+
+            <section className="space-y-4 border-t border-border pt-6">
+              <div className="flex items-center justify-between">
+                <div>
+                  <Label htmlFor="recurring-toggle">Recurring Invoice</Label>
+                  <p className="text-xs text-muted-foreground">
+                    Auto-generate a new invoice on this schedule from {data.date}.
+                  </p>
+                </div>
+                <Switch id="recurring-toggle" checked={makeRecurring} onCheckedChange={setMakeRecurring} />
+              </div>
+              {makeRecurring && (
+                <div className="space-y-2 max-w-xs">
+                  <Label htmlFor="frequency">Frequency</Label>
+                  <Select value={frequency} onValueChange={(v) => setFrequency(v as typeof frequency)}>
+                    <SelectTrigger id="frequency">
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="weekly">Weekly</SelectItem>
+                      <SelectItem value="monthly">Monthly</SelectItem>
+                      <SelectItem value="quarterly">Quarterly</SelectItem>
+                      <SelectItem value="yearly">Yearly</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+              )}
+            </section>
+          </div>
+        )}
 
         <div className="space-y-4">
           <div className="bg-muted/50 rounded-lg p-3 text-center">
