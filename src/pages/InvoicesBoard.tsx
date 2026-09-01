@@ -3,11 +3,11 @@ import { useNavigate } from "react-router-dom";
 import { format } from "date-fns";
 import {
   getAllInvoicesWithContext,
-  markInvoicePaid,
-  unmarkInvoicePaid,
+  setInvoiceStatus,
   uploadReceipt,
   setInvoiceReceiptUrl,
   InvoiceWithContext,
+  InvoiceStatus,
   Invoice,
 } from "@/lib/api";
 import { calculateTotal, formatCurrency } from "@/lib/invoiceCalc";
@@ -15,17 +15,22 @@ import { renderElementToPdf, offscreenClass } from "@/lib/pdf";
 import { ReceiptPreview } from "@/components/ReceiptPreview";
 import { toast } from "sonner";
 
-type Column = "unpaid" | "overdue" | "paid";
+type Column = "draft" | "sent" | "overdue" | "paid" | "cancelled";
 
 const COLUMNS: { key: Column; title: string }[] = [
-  { key: "unpaid", title: "Unpaid" },
+  { key: "draft", title: "Draft" },
+  { key: "sent", title: "Sent" },
   { key: "overdue", title: "Overdue" },
   { key: "paid", title: "Paid" },
+  { key: "cancelled", title: "Cancelled" },
 ];
 
+// "Overdue" is a view of sent invoices past their due date, not a real status.
+const targetStatus = (column: Column): InvoiceStatus => (column === "overdue" ? "sent" : column);
+
 const columnOf = (invoice: Invoice, today: string): Column => {
-  if (invoice.status === "paid") return "paid";
-  return invoice.due_date < today ? "overdue" : "unpaid";
+  if (invoice.status === "sent" && invoice.due_date < today) return "overdue";
+  return invoice.status;
 };
 
 const InvoicesBoard = () => {
@@ -63,30 +68,32 @@ const InvoicesBoard = () => {
 
   const today = format(new Date(), "yyyy-MM-dd");
 
-  const handleDrop = async (e: React.DragEvent, target: Column) => {
+  const handleDrop = async (e: React.DragEvent, targetColumn: Column) => {
     e.preventDefault();
     const id = e.dataTransfer.getData("text/plain");
     const invoice = invoices.find((i) => i.id === id);
     if (!invoice) return;
-    const current = columnOf(invoice, today);
+    const desired = targetStatus(targetColumn);
+    if (desired === invoice.status) return; // no-op, e.g. dragging within Sent/Overdue
 
-    if (target === "paid" && current !== "paid") {
+    if (desired === "paid") {
       if (!confirm(`Mark invoice ${invoice.invoice_number} as paid? This will also generate a receipt.`)) return;
       try {
-        const updated = await markInvoicePaid(invoice.id);
+        const updated = await setInvoiceStatus(invoice.id, "paid");
         setInvoices((prev) => prev.map((i) => (i.id === updated.id ? { ...i, ...updated } : i)));
         setPendingReceipt(updated);
       } catch (err) {
         toast.error(err instanceof Error ? err.message : "Failed to mark paid");
       }
-    } else if (target !== "paid" && current === "paid") {
-      try {
-        const updated = await unmarkInvoicePaid(invoice.id);
-        setInvoices((prev) => prev.map((i) => (i.id === updated.id ? { ...i, ...updated } : i)));
-        toast.success(`${invoice.invoice_number} marked unpaid`);
-      } catch (err) {
-        toast.error(err instanceof Error ? err.message : "Failed to update invoice");
-      }
+      return;
+    }
+
+    try {
+      const updated = await setInvoiceStatus(invoice.id, desired);
+      setInvoices((prev) => prev.map((i) => (i.id === updated.id ? { ...i, ...updated } : i)));
+      toast.success(`${invoice.invoice_number} marked ${desired}`);
+    } catch (err) {
+      toast.error(err instanceof Error ? err.message : "Failed to update invoice");
     }
   };
 
@@ -96,7 +103,7 @@ const InvoicesBoard = () => {
     <div className="space-y-6">
       <h1 className="text-2xl font-bold text-foreground">Invoices</h1>
 
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4">
         {COLUMNS.map((column) => {
           const columnInvoices = invoices.filter((i) => columnOf(i, today) === column.key);
           return (

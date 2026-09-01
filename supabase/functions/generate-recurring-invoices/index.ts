@@ -100,6 +100,8 @@ Deno.serve(async (_req: Request) => {
           date: candidateStr,
           due_date: format(dueDate, "yyyy-MM-dd"),
           data: invoiceData,
+          // auto-generated invoices skip "draft" — the whole point of recurring is no manual step
+          status: "sent",
           recurring_schedule_id: schedule.id,
           recurring_period_date: candidateStr,
         });

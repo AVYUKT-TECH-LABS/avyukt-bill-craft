@@ -21,7 +21,7 @@ const Dashboard = () => {
   const now = new Date();
   const today = format(now, "yyyy-MM-dd");
 
-  const unpaid = invoices.filter((i) => i.status === "unpaid");
+  const unpaid = invoices.filter((i) => i.status === "sent");
   const overdue = unpaid.filter((i) => i.due_date < today);
   const outstanding = unpaid.reduce((sum, i) => sum + calculateTotal(i.data), 0);
   const overdueTotal = overdue.reduce((sum, i) => sum + calculateTotal(i.data), 0);

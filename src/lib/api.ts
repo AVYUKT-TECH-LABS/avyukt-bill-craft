@@ -4,7 +4,8 @@ import { InvoiceData } from "@/types/invoice";
 
 export type Client = Tables<"clients">;
 export type Project = Tables<"projects">;
-export type Invoice = Omit<Tables<"invoices">, "data"> & { data: InvoiceData };
+export type InvoiceStatus = "draft" | "sent" | "paid" | "cancelled";
+export type Invoice = Omit<Tables<"invoices">, "data" | "status"> & { data: InvoiceData; status: InvoiceStatus };
 export type RecurringSchedule = Tables<"recurring_schedules">;
 export type CompanySettings = Tables<"company_settings">;
 
@@ -147,27 +148,14 @@ export const updateInvoiceData = async (id: string, invoiceData: InvoiceData) =>
   return data as unknown as Invoice;
 };
 
-export const markInvoicePaid = async (id: string) => {
-  const { data, error } = await supabase
-    .from("invoices")
-    .update({ status: "paid", paid_at: new Date().toISOString() })
-    .eq("id", id)
-    .select()
-    .single();
-  if (error) throw error;
-  return data as unknown as Invoice;
-};
-
-// Reverses markInvoicePaid — e.g. a card dragged back off the Paid column by mistake.
-// Leaves the already-generated receipt file in storage (harmless orphan) but clears
-// the invoice's reference to it, since it no longer reflects the invoice's paid state.
-export const unmarkInvoicePaid = async (id: string) => {
-  const { data, error } = await supabase
-    .from("invoices")
-    .update({ status: "unpaid", paid_at: null, receipt_url: null })
-    .eq("id", id)
-    .select()
-    .single();
+// Moving to "paid" stamps paid_at; moving away from "paid" (e.g. a Kanban card dragged
+// back off the Paid column) clears paid_at and the receipt link, since neither reflects
+// the invoice's state anymore. The already-generated receipt file is left in storage as
+// a harmless orphan rather than adding a delete round-trip for it.
+export const setInvoiceStatus = async (id: string, status: InvoiceStatus) => {
+  const patch =
+    status === "paid" ? { status, paid_at: new Date().toISOString() } : { status, paid_at: null, receipt_url: null };
+  const { data, error } = await supabase.from("invoices").update(patch).eq("id", id).select().single();
   if (error) throw error;
   return data as unknown as Invoice;
 };

@@ -68,7 +68,7 @@ const ProjectDetail = () => {
                 <TableCell>{format(new Date(invoice.date), "MMM dd, yyyy")}</TableCell>
                 <TableCell>{format(new Date(invoice.due_date), "MMM dd, yyyy")}</TableCell>
                 <TableCell>
-                  <Badge variant={invoice.status === "paid" ? "default" : "secondary"}>
+                  <Badge variant={invoice.status === "paid" ? "default" : invoice.status === "cancelled" ? "destructive" : "secondary"}>
                     {invoice.status}
                   </Badge>
                 </TableCell>

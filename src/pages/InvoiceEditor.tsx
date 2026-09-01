@@ -5,6 +5,7 @@ import { InvoiceForm } from "@/components/InvoiceForm";
 import { InvoicePreview } from "@/components/InvoicePreview";
 import { ReceiptPreview } from "@/components/ReceiptPreview";
 import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
 import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
@@ -19,7 +20,7 @@ import {
   createInvoice,
   updateInvoiceData,
   countInvoicesOnDate,
-  markInvoicePaid,
+  setInvoiceStatus,
   uploadReceipt,
   setInvoiceReceiptUrl,
   getReceiptSignedUrl,
@@ -174,7 +175,7 @@ const InvoiceEditor = () => {
     if (!confirm("Mark this invoice as paid? This will also generate a receipt.")) return;
     setSaving(true);
     try {
-      const paid = await markInvoicePaid(invoice.id);
+      const paid = await setInvoiceStatus(invoice.id, "paid");
       setInvoice(paid);
 
       if (receiptRef.current) {
@@ -187,6 +188,33 @@ const InvoiceEditor = () => {
       toast.success("Invoice marked paid, receipt generated");
     } catch (e) {
       toast.error(e instanceof Error ? e.message : "Failed to mark paid");
+    } finally {
+      setSaving(false);
+    }
+  };
+
+  const handleMarkSent = async () => {
+    if (!invoice) return;
+    setSaving(true);
+    try {
+      setInvoice(await setInvoiceStatus(invoice.id, "sent"));
+      toast.success("Invoice marked sent");
+    } catch (e) {
+      toast.error(e instanceof Error ? e.message : "Failed to update invoice");
+    } finally {
+      setSaving(false);
+    }
+  };
+
+  const handleCancel = async () => {
+    if (!invoice) return;
+    if (!confirm("Cancel this invoice? It will be excluded from outstanding/overdue totals.")) return;
+    setSaving(true);
+    try {
+      setInvoice(await setInvoiceStatus(invoice.id, "cancelled"));
+      toast.success("Invoice cancelled");
+    } catch (e) {
+      toast.error(e instanceof Error ? e.message : "Failed to cancel invoice");
     } finally {
       setSaving(false);
     }
@@ -227,17 +255,34 @@ const InvoiceEditor = () => {
     <div className="space-y-6">
       <div className="flex items-center justify-between flex-wrap gap-3">
         <div>
-          <h1 className="text-2xl font-bold text-foreground">
-            {isCreate ? "New Invoice" : `Invoice ${data.invoiceNumber}`}
-          </h1>
+          <div className="flex items-center gap-2">
+            <h1 className="text-2xl font-bold text-foreground">
+              {isCreate ? "New Invoice" : `Invoice ${data.invoiceNumber}`}
+            </h1>
+            {invoice && (
+              <Badge variant={invoice.status === "paid" ? "default" : invoice.status === "cancelled" ? "destructive" : "secondary"}>
+                {invoice.status}
+              </Badge>
+            )}
+          </div>
           <button onClick={() => navigate(-1)} className="text-sm text-primary hover:underline">
             &larr; Back
           </button>
         </div>
         <div className="flex gap-2 flex-wrap">
-          {invoice?.status === "unpaid" && (
+          {invoice?.status === "draft" && (
+            <Button onClick={handleMarkSent} variant="outline" disabled={saving}>
+              Mark as Sent
+            </Button>
+          )}
+          {(invoice?.status === "draft" || invoice?.status === "sent") && (
             <Button onClick={handleMarkPaid} variant="outline" disabled={saving}>
               Mark as Paid
+            </Button>
+          )}
+          {(invoice?.status === "draft" || invoice?.status === "sent") && (
+            <Button onClick={handleCancel} variant="outline" disabled={saving}>
+              Cancel Invoice
             </Button>
           )}
           {invoice?.receipt_url && (
