@@ -21,6 +21,9 @@ export const AppLayout = () => {
             <NavLink to="/clients" className={navLinkClass} activeClassName={activeNavLinkClass}>
               Clients
             </NavLink>
+            <NavLink to="/invoices" className={navLinkClass} activeClassName={activeNavLinkClass}>
+              Invoices
+            </NavLink>
             <NavLink to="/settings" className={navLinkClass} activeClassName={activeNavLinkClass}>
               Settings
             </NavLink>

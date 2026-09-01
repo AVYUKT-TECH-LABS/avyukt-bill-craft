@@ -1,7 +1,5 @@
 import { useEffect, useRef, useState } from "react";
 import { useNavigate, useParams, useSearchParams } from "react-router-dom";
-import html2canvas from "html2canvas";
-import jsPDF from "jspdf";
 import { addDays, format } from "date-fns";
 import { InvoiceForm } from "@/components/InvoiceForm";
 import { InvoicePreview } from "@/components/InvoicePreview";
@@ -12,6 +10,7 @@ import { Switch } from "@/components/ui/switch";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { InvoiceData } from "@/types/invoice";
 import { nextInvoiceNumber } from "@/lib/invoiceNumber";
+import { renderElementToPdf, offscreenClass } from "@/lib/pdf";
 import {
   getProject,
   getClient,
@@ -158,23 +157,11 @@ const InvoiceEditor = () => {
     }
   };
 
-  const renderToPdfBlob = async (el: HTMLDivElement) => {
-    const canvas = await html2canvas(el, { scale: 2, useCORS: true, logging: false, backgroundColor: "#ffffff" });
-    const imgData = canvas.toDataURL("image/png");
-    const pdf = new jsPDF({ orientation: "portrait", unit: "mm", format: "a4" });
-    const pdfWidth = pdf.internal.pageSize.getWidth();
-    const pdfHeight = pdf.internal.pageSize.getHeight();
-    const ratio = pdfWidth / canvas.width;
-    const scaledHeight = canvas.height * ratio;
-    pdf.addImage(imgData, "PNG", 0, 0, pdfWidth, Math.min(scaledHeight, pdfHeight));
-    return pdf;
-  };
-
   const handleDownloadPDF = async () => {
     if (!previewRef.current || !data) return;
     try {
       toast.loading("Generating PDF...");
-      const pdf = await renderToPdfBlob(previewRef.current);
+      const pdf = await renderElementToPdf(previewRef.current);
       pdf.save(`Invoice_${data.invoiceNumber}.pdf`);
       toast.success("PDF downloaded");
     } catch (e) {
@@ -191,7 +178,7 @@ const InvoiceEditor = () => {
       setInvoice(paid);
 
       if (receiptRef.current) {
-        const pdf = await renderToPdfBlob(receiptRef.current);
+        const pdf = await renderElementToPdf(receiptRef.current);
         const blob = pdf.output("blob");
         const path = await uploadReceipt(invoice.id, blob);
         const withReceipt = await setInvoiceReceiptUrl(invoice.id, path);
@@ -318,7 +305,7 @@ const InvoiceEditor = () => {
       </div>
 
       {invoice && (
-        <div className="hidden">
+        <div className={offscreenClass}>
           <ReceiptPreview data={data} paidAt={invoice.paid_at ?? new Date().toISOString()} ref={receiptRef} />
         </div>
       )}

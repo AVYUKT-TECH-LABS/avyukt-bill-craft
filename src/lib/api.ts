@@ -89,6 +89,17 @@ export const getAllInvoices = async () => {
   return data as unknown as Invoice[];
 };
 
+export type InvoiceWithContext = Invoice & { projects: { name: string; clients: { name: string } } };
+
+export const getAllInvoicesWithContext = async () => {
+  const { data, error } = await supabase
+    .from("invoices")
+    .select("*, projects(name, clients(name))")
+    .order("due_date");
+  if (error) throw error;
+  return data as unknown as InvoiceWithContext[];
+};
+
 export const getInvoice = async (id: string) => {
   const { data, error } = await supabase.from("invoices").select("*").eq("id", id).single();
   if (error) throw error;
@@ -140,6 +151,20 @@ export const markInvoicePaid = async (id: string) => {
   const { data, error } = await supabase
     .from("invoices")
     .update({ status: "paid", paid_at: new Date().toISOString() })
+    .eq("id", id)
+    .select()
+    .single();
+  if (error) throw error;
+  return data as unknown as Invoice;
+};
+
+// Reverses markInvoicePaid — e.g. a card dragged back off the Paid column by mistake.
+// Leaves the already-generated receipt file in storage (harmless orphan) but clears
+// the invoice's reference to it, since it no longer reflects the invoice's paid state.
+export const unmarkInvoicePaid = async (id: string) => {
+  const { data, error } = await supabase
+    .from("invoices")
+    .update({ status: "unpaid", paid_at: null, receipt_url: null })
     .eq("id", id)
     .select()
     .single();

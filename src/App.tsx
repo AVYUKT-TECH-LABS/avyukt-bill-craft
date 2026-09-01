@@ -11,6 +11,7 @@ import Dashboard from "./pages/Dashboard";
 import Clients from "./pages/Clients";
 import ClientDetail from "./pages/ClientDetail";
 import ProjectDetail from "./pages/ProjectDetail";
+import InvoicesBoard from "./pages/InvoicesBoard";
 import InvoiceEditor from "./pages/InvoiceEditor";
 import Settings from "./pages/Settings";
 import NotFound from "./pages/NotFound";
@@ -32,6 +33,7 @@ const App = () => (
                 <Route path="/clients" element={<Clients />} />
                 <Route path="/clients/:clientId" element={<ClientDetail />} />
                 <Route path="/clients/:clientId/projects/:projectId" element={<ProjectDetail />} />
+                <Route path="/invoices" element={<InvoicesBoard />} />
                 <Route path="/invoices/new" element={<InvoiceEditor />} />
                 <Route path="/invoices/:invoiceId" element={<InvoiceEditor />} />
                 <Route path="/settings" element={<Settings />} />
