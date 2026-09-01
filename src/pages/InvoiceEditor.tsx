@@ -345,7 +345,7 @@ const InvoiceEditor = () => {
           <div className="bg-muted/50 rounded-lg p-3 text-center">
             <p className="text-sm font-medium text-foreground">Live Preview</p>
           </div>
-          <InvoicePreview data={data} ref={previewRef} />
+          <InvoicePreview data={data} paid={invoice?.status === "paid"} ref={previewRef} />
         </div>
       </div>
 

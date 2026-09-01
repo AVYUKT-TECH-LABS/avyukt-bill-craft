@@ -3,6 +3,7 @@ import { calculateTotal, formatCurrency } from "@/lib/invoiceCalc";
 import { format } from "date-fns";
 import logo from "@/assets/avyukt-logo.webp";
 import { forwardRef } from "react";
+import { PaidStamp } from "@/components/PaidStamp";
 
 interface ReceiptPreviewProps {
   data: InvoiceData;
@@ -13,7 +14,8 @@ export const ReceiptPreview = forwardRef<HTMLDivElement, ReceiptPreviewProps>(({
   const total = calculateTotal(data);
 
   return (
-    <div ref={ref} className="p-8 max-w-2xl mx-auto bg-white">
+    <div ref={ref} className="p-8 max-w-2xl mx-auto bg-white relative">
+      <PaidStamp />
       <div className="flex justify-between items-start mb-8">
         <img src={logo} alt={data.companyName} className="h-16 object-contain" />
         <div className="text-right">

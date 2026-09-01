@@ -9,12 +9,14 @@ import {
   calculateTaxAmount,
   formatCurrency,
 } from "@/lib/invoiceCalc";
+import { PaidStamp } from "@/components/PaidStamp";
 
 interface InvoicePreviewProps {
   data: InvoiceData;
+  paid?: boolean;
 }
 
-export const InvoicePreview = forwardRef<HTMLDivElement, InvoicePreviewProps>(({ data }, ref) => {
+export const InvoicePreview = forwardRef<HTMLDivElement, InvoicePreviewProps>(({ data, paid }, ref) => {
   const formatDate = (dateString: string) => {
     if (!dateString) return "";
     try {
@@ -42,6 +44,7 @@ export const InvoicePreview = forwardRef<HTMLDivElement, InvoicePreviewProps>(({
     <div className="bg-background border border-border rounded-lg shadow-lg overflow-hidden">
       {/* PDF Content - this part gets captured */}
       <div ref={ref} className="p-8 max-w-4xl mx-auto relative bg-white">
+        {paid && <PaidStamp />}
         {/* Watermark */}
         <div 
           className="absolute inset-0 flex items-center justify-center pointer-events-none"
